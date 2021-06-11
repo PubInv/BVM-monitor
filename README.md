@@ -25,6 +25,10 @@ They also did a number of interviews with EMTS to justify the design ideas.
 Our current plan is to build a very small battery-powered device around the Sensirion SFM3X00 device that is pluggable into a standard 22mm airway and 
 makes the use a BVM safer. We believe we can iterate on the current design, test further, and gain more validation for this device.
 
+## Current Team
+
+Alvin, Matthew and Alois.
+
 ## Goal
 
 We seek to save lives.
