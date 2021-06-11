@@ -27,7 +27,15 @@ makes the use a BVM safer. We believe we can iterate on the current design, test
 
 ## Goal
 
-Our goal is to produce a free-libre open source design that is good enough that some manufacturing firm (not us) will undertake to make and market this device,
+We seek to save lives.
+
+Our approach is to produce a free-libre open source design that is good enough that some manufacturing firm (not us) will undertake to make and market this device,
 obtaining whatever regulatory approval is needed to do so. We hope such a firm or firms make profits, but we will not allow them to monopolize this work.
 That is, we hope Firm A makes this device that it saves lives in the field eventually, but we will not allow Firm A to prevent Firm B from doing the same things.
 To that end we will use the [AGPL license](https://www.gnu.org/licenses/agpl-3.0.en.html) for all code, and [ERN strong reciprocal](https://ohwr.org/cern_ohl_s_v2.txt) license for hardware desings, as noted in the [Public Invention Licensing Guidelines](https://github.com/PubInv/PubInv-License-Guidelines).
+
+### Secondary Goal
+
+This device is effectively a spirometer, which could be used as a non-medical spirometer, as used by athletes and wind-instrument players to improve their skils.
+We have no objectiong to this device being used for that purpose, but this goal is subordinate to saving lives.
+
