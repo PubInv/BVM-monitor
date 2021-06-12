@@ -3,7 +3,7 @@ A monitor for Bag Valve Masks to measure flow (tidal volume) and prevent operato
 
 ## Motivation
 
-Bag Valve Masks are a fundemental tool used by first responders to assiste patients in respiratory distress. A recognized problem is that they can produce
+Bag Valve Masks are a fundamental tool used by first responders to assiste patients in respiratory distress. A recognized problem is that they can produce
 barotrauma and other forms of volumetric trauma. Particularly in stressful situations, they may be overused. 
 
 The basic idea of this project is to build a small electronic gadget that helps an operator use the device correctly by measuring and correcting both 
@@ -11,11 +11,11 @@ the tidal volume delivered and the flow.
 
 ## History
 
-This idea was created in coversation between Robert L. Read and Dr. Erich Schulz of Australia while working on the [VentOS project](https://gitlab.com/project-ventos/ventos). Public Invention already had the [VentMon](https://github.com/PubInv/ventmon-ventilator-inline-test-monitor), which performed flow measurment and integrated it get Tidal Volume. This was presented to a Rice University Freshman Design Team, called "Mask and You Shall Recieve" TBD: put their names here!
+This idea was created in conversation between Robert L. Read and Dr. Erich Schulz of Australia while working on the [VentOS project](https://gitlab.com/project-ventos/ventos). Public Invention already had the [VentMon](https://github.com/PubInv/ventmon-ventilator-inline-test-monitor), which performed flow measurement and integrated it get Tidal Volume. This was presented to a Rice University Freshman Design Team, called "Mask and You Shall Recieve" TBD: put their names here!
 
 In the course of the 20-21 school year that did a fair amount of research (including finding an earlier project at Pittsburg, apparently now abandonded.) They
-took a VentMon and essentially removed features, producign a stripped-down version that could be thought of as a separate device. They successfully moved the 
-integration of flow from the Sensirion SFM3X00 sensor into the Arduion code.
+took a VentMon and essentially removed features, producing a stripped-down version that could be thought of as a separate device. They successfully moved the 
+integration of flow from the Sensirion SFM3X00 sensor into the Arduino code.
 
 The result is a small device with a beeper and digital display (almost a spirometer) that outputs tidal volume and notes a 6-second cadence.
 They also did a number of interviews with EMTS to justify the design ideas.
@@ -41,5 +41,5 @@ To that end we will use the [AGPL license](https://www.gnu.org/licenses/agpl-3.0
 ### Secondary Goal
 
 This device is effectively a spirometer, which could be used as a non-medical spirometer, as used by athletes and wind-instrument players to improve their skils.
-We have no objectiong to this device being used for that purpose, but this goal is subordinate to saving lives.
+We have no objection to this device being used for that purpose, but this goal is subordinate to saving lives.
 
