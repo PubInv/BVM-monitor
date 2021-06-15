@@ -27,7 +27,7 @@ makes the use a BVM safer. We believe we can iterate on the current design, test
 
 ## Current Team
 
-Alvin, Matthew and Alois.
+Alvin Ibeabuchi, Matthew and Alois.
 
 ## Goal
 
