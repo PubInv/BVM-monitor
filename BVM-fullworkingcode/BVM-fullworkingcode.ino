@@ -4,7 +4,9 @@
 #include <SPI.h>
 #include <Arduino.h>
 #include <Adafruit_GFX.h>
-#include <Adafruit_SSD1351.h>
+//#include <Adafruit_SSD1351.h>
+#include <Adafruit_ST7735.h> // Hardware-specific library for ST7735
+#include <Adafruit_ST7789.h> // Hardware-specific library for ST7789
 
 int interval = 0;
 const int speakerPin = 5;
@@ -30,17 +32,21 @@ bool SENSOR_INSTALLED_BACKWARD = false;
 SFM3X00 flowSensor(FLOW_SENSOR_ADDRESS);
 
 #define SCREEN_WIDTH  128
-#define SCREEN_HEIGHT 128 // Change this to 96 for 1.27" OLED.
+#define SCREEN_HEIGHT 128 // Change this to 96 for 1.27" display.
 
 // The SSD1351 is connected like this (plus VCC plus GND)
-const uint8_t   OLED_pin_scl_sck        = 13;
-const uint8_t   OLED_pin_sda_mosi       = 11;
-const uint8_t   OLED_pin_cs_ss          = 10;
-const uint8_t   OLED_pin_res_rst        = 8;
-const uint8_t   OLED_pin_dc_rs          = 7;
+//const uint8_t   display_pin_scl_sck        = 13;
+//const uint8_t   display_pin_sda_mosi       = 11;
+//const uint8_t   display_pin_cs_ss          = 10;
+//const uint8_t   display_pin_res_rst        = 8;
+//const uint8_t   display_pin_dc_rs          = 7;
+#define TFT_CS        10
+#define TFT_RST        8 // Or set to -1 and connect to Arduino RESET pin
+#define TFT_DC         7
 
 // declare the display
-Adafruit_SSD1351 oled = Adafruit_SSD1351(SCREEN_WIDTH,SCREEN_HEIGHT,&SPI,OLED_pin_cs_ss,OLED_pin_dc_rs,OLED_pin_res_rst);
+//Adafruit_SSD1351 display = Adafruit_SSD1351(SCREEN_WIDTH,SCREEN_HEIGHT,&SPI,display_pin_cs_ss,display_pin_dc_rs,display_pin_res_rst);
+Adafruit_ST7735 display = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
 
 // SSD1331 color definitions
 const uint16_t  Black        = 0x0000;
@@ -53,8 +59,8 @@ const uint16_t  Yellow       = 0xFFE0;
 const uint16_t  White        = 0xFFFF;
 
 // The colors we actually want to use
-uint16_t        OLED_Text_Color         = Black;
-uint16_t        OLED_Backround_Color    = Blue;
+uint16_t        display_Text_Color         = Black;
+uint16_t        display_Backround_Color    = Blue;
 
 
 
@@ -62,12 +68,14 @@ unsigned long previousMillis = 0;
 
 ////////////////////////////////
 void setup() {
+   display.initR(INITR_GREENTAB);
 
   // initialise the SSD1331
-  oled.begin();
-  oled.setFont();
-  oled.fillScreen(Black);
-  oled.setTextWrap(false);
+ // display.begin();
+ // display.setFont();
+ // display.fillScreen(Black);
+  //the background color of the screen
+  //display.setTextWrap(false);
 
   Serial.begin(115200);
   Wire.begin();
@@ -91,7 +99,7 @@ void setup() {
 }
 
 // For calibrating, we will simply compute positive and negative volumes via integration,
-// Setting to zero on putton press of the OLED
+// Setting to zero on putton press of the display
 float G_volume = 0.0; 
 float last_ms = 0.0;
 float last_flow = 0.0;
@@ -166,16 +174,16 @@ void loop() {
       G_volume = 0;
       squeeze = false;
       restime = 0;
-      //oled.fillRect(0, 0, 128, 128, Red);
-      oled.setTextSize(3);
-      oled.setTextColor(Blue, Black);
-      oled.setCursor(10,50);
-      oled.print("0.0000");
+      //display.fillRect(0, 0, 128, 128, Red);
+      display.setTextSize(3);
+      display.setTextColor(Blue, Black);
+      display.setCursor(10,50);
+      display.print("0.0000");
 
-      oled.setTextSize(2);
-      oled.setTextColor(Black, Black);
-      oled.setCursor(25,100);
-      oled.print("DANGER");
+      display.setTextSize(2);
+      display.setTextColor(Black, Black);
+      display.setCursor(25,100);
+      display.print("DANGER");
       count = 0;
      }
      
@@ -224,39 +232,42 @@ void loop() {
     if(G_volume >= 0 && G_volume < 400)
     {
 
-    //oled.fillScreen(Blue);
-    oled.setTextSize(5);
-    oled.setTextColor(Blue, Black);
-    oled.setCursor(10,50);
-    oled.print(G_volume);
+    //display.fillScreen(Blue);
+    display.setTextSize(5);
+    display.setTextColor(Blue, Black);
+    display.setCursor(10,50);
+    display.print(G_volume);
     count = 0;
     }
     
     else if(G_volume >= 450 && G_volume < 650)
     {
-    //oled.fillScreen(Green);
-    oled.setTextSize(5);
-    oled.setTextColor(Green, Black);
-    oled.setCursor(10,50);
-    oled.print(G_volume);
+    //display.fillScreen(Green);
+    display.setTextSize(5);
+    display.setTextColor(Green, Black);
+    display.setCursor(10,50);
+    display.print(G_volume);
     count = 0;
     }
 
     else if(G_volume >= 650)
     {
-    //oled.fillScreen(Red);
-    oled.setTextSize(5);
-    oled.setTextColor(Red, Black);
-    oled.setCursor(10,50);
-    oled.print(G_volume);
+    //display.fillScreen(Red);
+    display.setTextSize(5);
+    display.setTextColor(Red, Black);
+    display.setCursor(10,50);
+    display.print(G_volume);
     
-    oled.setTextSize(2);
-    oled.setTextColor(Red, Black);
-    oled.setCursor(25,100);
-    oled.print("DANGER");
+    display.setTextSize(2);
+    display.setTextColor(Red, Black);
+    display.setCursor(25,100);
+    display.print("DANGER");
     count = 0;
     //}
   }
   }
+}
+
+  
 
   
