@@ -254,6 +254,14 @@ float min_recorded_flow = 0.0;
 
 /////////////////////////////////
 
+// Variables for supporting multiple tones
+boolean FirstTone = false;
+boolean SecondTone = false;
+long startFirst;
+long startSecond;
+boolean alarm;
+
+
 void loop() {
   display.fillScreen(BLACK);
   // read the millisecond clock...
@@ -436,6 +444,29 @@ void loop() {
   }
   if (alarmcount >= 3)
   {
+
+    Serial.println("BVM");
+    alarm = true;
+  if (alarm) {
+    FirstTone = true;
+    startFirst = millis();
+    tone(SPEAKER_PIN,440,500);
+    alarm = false;
+  }
+
+  if (FirstTone && millis() > (startFirst + 500)) {
+    SecondTone = true;
+    tone(SPEAKER_PIN,220,500);
+    startSecond = millis();
+    FirstTone = false;
+  }
+
+  if (SecondTone && millis() > (startSecond + 500)) {
+    noTone(SPEAKER_PIN);
+    FirstTone = false;
+    SecondTone = false;
+    alarm = false;
+  }
     Serial.println("BVM");
     tone(speakerPin, 261.626, 250);
     //Serial.println(millis());
