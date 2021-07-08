@@ -29,7 +29,7 @@ int bigcounting = 1;
 // of the physical connections you are using.
 bool SENSOR_INSTALLED_BACKWARD = false;
 
-// create insance of sensor with address 
+// create insance of sensor with address
 SFM3X00 flowSensor(FLOW_SENSOR_ADDRESS);
 
 #define SCREEN_WIDTH  240
@@ -65,7 +65,7 @@ const uint16_t  White        = 0xFFFF;
 #define GREEN    0x07E0
 #define CYAN     0x07FF
 #define MAGENTA  0xF81F
-#define YELLOW   0xFFE0 
+#define YELLOW   0xFFE0
 #define WHITE    0xFFFF
 #define MONO_CHROME_WHITE 0x01
 
@@ -127,7 +127,7 @@ float breath_length_ms = 6000.0; // the length of a breath in ms.
 float inspiration_time_ms = 2000.0; // the target length of an "inspiration"
 
 
-// This functional gives us a little encapsulation and let's me cover up a bug in 
+// This functional gives us a little encapsulation and let's me cover up a bug in
 // the Featherwing that doesn't draw the horizontal lines of a rectangle
 void myDrawRect(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, uint16_t color, bool fillNotDraw) {
   if (fillNotDraw) {
@@ -144,8 +144,8 @@ void render_empty_measure_bar() {
   uint16_t width = SCREEN_WIDTH * (float) MEASURE_BAR_WIDTH_HORIZONTAL;
   uint16_t bheight = SCREEN_HEIGHT * ((float) TARGET_BAR_PERCENT + (float) BAD_BAR_PERCENT);
   uint16_t theight = SCREEN_HEIGHT * ((float) TARGET_BAR_PERCENT);
-  uint16_t gheight = SCREEN_HEIGHT * ((float) TARGET_BAR_PERCENT - GOOD_BAR_PERCENT); 
-  
+  uint16_t gheight = SCREEN_HEIGHT * ((float) TARGET_BAR_PERCENT - GOOD_BAR_PERCENT);
+
   myDrawRect(left,top,width,bheight,WHITE, false);
 
   display.drawLine(left, SCREEN_HEIGHT - theight,left+ width-1, SCREEN_HEIGHT - theight, WHITE);
@@ -159,11 +159,11 @@ void render_empty_target_bar() {
 
   uint16_t bheight = SCREEN_HEIGHT * ((float) TARGET_BAR_PERCENT + (float) BAD_BAR_PERCENT);
   uint16_t theight = SCREEN_HEIGHT * ((float) TARGET_BAR_PERCENT);
-  uint16_t gheight = SCREEN_HEIGHT * ((float) TARGET_BAR_PERCENT - GOOD_BAR_PERCENT); 
+  uint16_t gheight = SCREEN_HEIGHT * ((float) TARGET_BAR_PERCENT - GOOD_BAR_PERCENT);
   myDrawRect(left,top,width,height,WHITE, false);
-  
+
   display.drawLine(left, SCREEN_HEIGHT - theight,left+ width-1, SCREEN_HEIGHT - theight, WHITE);
-  display.drawLine(left, SCREEN_HEIGHT - gheight,left+ width-1, SCREEN_HEIGHT - gheight, WHITE); 
+  display.drawLine(left, SCREEN_HEIGHT - gheight,left+ width-1, SCREEN_HEIGHT - gheight, WHITE);
 }
 void render_empty_bars() {
   render_empty_measure_bar();
@@ -174,9 +174,9 @@ void render_empty_bars() {
 void render_bar_percentage(float percent) {
 }
 
-// convert a tidal volume to a percentage 
+// convert a tidal volume to a percentage
 float convert_tv_ml_to_percent(int tv) {
-  
+
 }
 
 // render the "target line" as a percentage
@@ -186,12 +186,12 @@ void render_target_line(float percent) {
   uint16_t top = SCREEN_HEIGHT * (1.0 - ((float) TARGET_BAR_PERCENT + (float) BAD_BAR_PERCENT)) ;
  uint16_t theight = SCREEN_HEIGHT * ((float) TARGET_BAR_PERCENT);
   uint16_t pheight = (float) theight * ((float) percent);
-  
-  display.drawLine(left, 
+
+  display.drawLine(left,
     SCREEN_HEIGHT - pheight,
-    left+ width-1, 
-    SCREEN_HEIGHT - pheight, 
-    WHITE);  
+    left+ width-1,
+    SCREEN_HEIGHT - pheight,
+    WHITE);
 }
 
 // render_tv as a filled_in rect
@@ -205,11 +205,11 @@ void render_tv(float tv) {
 
 
   myDrawRect(left,SCREEN_HEIGHT - mheight,width, SCREEN_HEIGHT,WHITE, true);
-  display.drawLine(left, 
+  display.drawLine(left,
     SCREEN_HEIGHT - mheight,
-    left+ width-1, 
-    SCREEN_HEIGHT - mheight, 
-    WHITE);  
+    left+ width-1,
+    SCREEN_HEIGHT - mheight,
+    WHITE);
 }
 float compute_percent_of_inspiration(long ms) {
   if (ms < (long) inspiration_time_ms) {
@@ -249,15 +249,15 @@ void setup() {
   Serial.print("read flow offset: ");
   Serial.println(flowSensor.flowOffset);
   display.fillScreen(ST77XX_BLACK);
-  
+
   delay(100);
-  
+
   zero_integration(millis());
 }
 
 // For calibrating, we will simply compute positive and negative volumes via integration,
 // Setting to zero on putton press of the display
-float G_volume = 0.0; 
+float G_volume = 0.0;
 float last_ms = 0.0;
 float last_flow = 0.0;
 
@@ -275,7 +275,7 @@ float add_to_running_integration(float v,unsigned long ms,float flow_millilters_
   float ml_per_ms = f / (60.0 * 1000.0);
 
   v += (ms - last_ms) * (ml_per_ms + last_flow)/2.0;
-  
+
   last_ms = ms;
   last_flow = ml_per_ms;
 
@@ -289,7 +289,7 @@ float min_recorded_flow = 0.0;
 
 
 void loop() {
- display.fillScreen(BLACK);
+  // display.fillScreen(BLACK);
   // read the millisecond clock...
   long m = millis();
   // if m > breath_length_ms, we are doing to change our random error number...
@@ -307,48 +307,43 @@ void loop() {
     } else {
       error_reset = false;
     }
-  } 
-  
+  }
+
   float percent_full = compute_percent_of_inspiration(m);
-  display.fillScreen(BLACK);
-
-  render_empty_bars();
-
-  render_target_line(percent_full);
 
   float f = (m > inspiration_time_ms) ? 1.0 * error_for_faking : percent_full * error_for_faking;
 
   long fake_tv = f * target_tidal_volume_ml;
 
- 
-  
+
+
   short int incomingByte;
   while (Serial.available() > 0) {
     incomingByte = Serial.read();
     Serial.print(incomingByte);
-    if (incomingByte == '\n') { 
+    if (incomingByte == '\n') {
         Serial.println("Zeroing! 0000000000000000000000000000");
           zero_integration(millis());
     }
   }
-  
+
  // we don't know how long the Serial operation will take,
- // so we read the millisecond clock again... 
+ // so we read the millisecond clock again...
   unsigned long ms = millis();
 
   float raw_flow_slm = flowSensor.readFlow();  // standard liters per minute
   bool extreme_range = flowSensor.checkRange(raw_flow_slm);
   if (extreme_range) {
     Serial.println("RANGE OF SENSOR EXCEEDED");
-    
+
   }
   min_recorded_flow = min(min_recorded_flow,raw_flow_slm);
   max_recorded_flow = max(max_recorded_flow,raw_flow_slm);
 
   float flow = (SENSOR_INSTALLED_BACKWARD) ? -raw_flow_slm : raw_flow_slm;
- 
+
   // if the flow is less than 0.01 then round to 0
-  
+
   if(abs(flow) < MINIMUM_FLOW)
   {
      flow = 0;
@@ -359,8 +354,8 @@ void loop() {
      }
      restime = millis() - startreset;
      //Serial.println(restime);
-     
-     
+
+
      if(restime > 3000)
      {
       G_volume = 0;
@@ -378,7 +373,7 @@ void loop() {
       display.print("DANGER");
       count = 0;*/
      }
-     
+
   }
   else
   {
@@ -388,11 +383,14 @@ void loop() {
   float flow_milliliters_per_minute =  (flow * 1000.0);
 
   G_volume = add_to_running_integration(G_volume, ms,flow_milliliters_per_minute);
-   Serial.println(G_volume);
+  Serial.println(G_volume);
 
-    Serial.println("fake tv");
-  Serial.println(fake_tv);
+  display.fillScreen(BLACK);
+  render_empty_bars();
+  render_target_line(percent_full);
   render_tv(G_volume);
+
+
   //display.display();
   yield();
   delay(10);
@@ -412,23 +410,23 @@ void loop() {
     previousMillis = currentMillis;
     interval = interval +1;
   }
- 
+
   Serial.println(interval);
       if (interval % 6 == 0){
       //changed from tone (12, 700, 1000);
-      tone(speakerPin, 329.628, 1000); 
+      tone(speakerPin, 329.628, 1000);
       //Serial.println("Speaker");
-      } 
+      }
       else {
       noTone(speakerPin);
      // Serial.println("NoSpeaker");
-     
+
       }
-  
+
   count = count+1;
   if(interval % 6 == 0)
   {
-    
+
     if(G_volume >= 0 && G_volume < 400)
     {
 
@@ -440,7 +438,7 @@ void loop() {
     count = 0;*/
     alarmcount = alarmcount +1 ;
     }
-    
+
     else if(G_volume >= 450 && G_volume < 650)
     {
     /*//display.fillScreen(Green);
@@ -459,7 +457,7 @@ void loop() {
     display.setTextColor(Red, Black);
     display.setCursor(10,50);
     display.print(G_volume);
-    
+
     display.setTextSize(2);
     display.setTextColor(Red, Black);
     display.setCursor(25,100);
@@ -482,9 +480,9 @@ void loop() {
     alarm = false;
   }
 
-  
+
     Serial.println("BVM");
-    
+
     }
   }
   if (FirstTone && millis() > (startFirst + TONEDURATION_MS)) {
@@ -506,12 +504,12 @@ void loop() {
   if (FourthTone && millis() > (startFourth + TONEDURATION_MS)) {
     tone(speakerPin,FIFTHTONE,TONEDURATION_MS);
     startFifth = millis();
-    FourthTone = false;  
+    FourthTone = false;
   }
   if (FifthTone && millis() > (startFifth + TONEDURATION_MS)) {
     tone(speakerPin,SIXTHTONE,TONEDURATION_MS);
     startSixth = millis();
-    FifthTone = false;  
+    FifthTone = false;
   }
   if (SixthTone && millis() > (startSixth + TONEDURATION_MS)) {
     noTone(speakerPin);
