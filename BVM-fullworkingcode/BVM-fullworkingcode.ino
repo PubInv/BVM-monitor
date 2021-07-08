@@ -118,7 +118,7 @@ boolean alarm;
 // This defines two separate "bars" --- because I only have a monocrhome display,
 // I am doing two side-by-side
 #define MEASURE_BAR_START_HORIZONTAL 0.1
-#define MEASURE_BAR_WIDTH_HORIZONTAL 0.4
+#define MEASURE_BAR_WIDTH_HORIZONTAL 0.8
 #define TARGET_BAR_START_HORIZONTAL 0.6
 #define TARGET_BAR_WIDTH_HORIZONTAL 0.4
 
@@ -136,6 +136,10 @@ void myDrawRect(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, uint16_t color
   display.drawRect(x0, y0, w, h, color);
   display.drawLine(x0, y0, x0+w-1,y0, color);
   display.drawLine(x0, y0+h-1, x0+w-1,y0+h-1, color);
+}
+
+void myEraseInteriorRect(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, uint16_t color) {
+  display.fillRect(x0+1, y0+1, w-1, h-1, color);
 }
 // draw the empty bar
 void render_empty_measure_bar() {
@@ -167,7 +171,7 @@ void render_empty_target_bar() {
 }
 void render_empty_bars() {
   render_empty_measure_bar();
-  render_empty_target_bar();
+  // render_empty_target_bar();
 }
 
 // render the bar to a certain percentage height, dealing with "good" and "bad" color changes
@@ -223,6 +227,11 @@ float compute_percent_of_inspiration(long ms) {
 float error_for_faking = 1.2;
 bool error_reset = false;
 
+void eraseScreen() {
+  display.fillScreen(ST77XX_BLACK);
+  render_empty_bars();
+}
+
 void setup() {
    display.init(240,320);
 
@@ -253,6 +262,8 @@ void setup() {
   delay(100);
 
   zero_integration(millis());
+
+  erase_screen();
 }
 
 // For calibrating, we will simply compute positive and negative volumes via integration,
@@ -287,7 +298,6 @@ float min_recorded_flow = 0.0;
 
 /////////////////////////////////
 
-
 void loop() {
   // display.fillScreen(BLACK);
   // read the millisecond clock...
@@ -298,24 +308,7 @@ void loop() {
   // Perform "modulo" operation to get ms within the current breath
   m = m % (long) breath_length_ms;
 
-// When we are done with the current inspiration we will set another random error...
-  if (!error_reset) {
-    if (m > inspiration_time_ms) {
-      // We'll fake being either 20% too high or too low for now...
-      error_for_faking =   1.0 + 0.2 * (float) (random(100) - 50) / 50.0 ;
-      error_reset = true;
-    } else {
-      error_reset = false;
-    }
-  }
-
   float percent_full = compute_percent_of_inspiration(m);
-
-  float f = (m > inspiration_time_ms) ? 1.0 * error_for_faking : percent_full * error_for_faking;
-
-  long fake_tv = f * target_tidal_volume_ml;
-
-
 
   short int incomingByte;
   while (Serial.available() > 0) {
@@ -385,9 +378,9 @@ void loop() {
   G_volume = add_to_running_integration(G_volume, ms,flow_milliliters_per_minute);
   Serial.println(G_volume);
 
-  display.fillScreen(BLACK);
-  render_empty_bars();
-  render_target_line(percent_full);
+  //  display.fillScreen(BLACK);
+  //  render_empty_bars();
+  //  render_target_line(percent_full);
   render_tv(G_volume);
 
 
@@ -426,6 +419,7 @@ void loop() {
   count = count+1;
   if(interval % 6 == 0)
   {
+    eraseScreen();
 
     if(G_volume >= 0 && G_volume < 400)
     {
@@ -465,6 +459,9 @@ void loop() {
     count = 0;*/
     alarmcount = alarmcount +1 ;
     //}
+
+    // Now erase the screen...
+
   }
   Serial.println("alarmcount");
   Serial.println(alarmcount);
