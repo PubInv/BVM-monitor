@@ -29,7 +29,7 @@ int bigcounting = 1;
 // of the physical connections you are using.
 bool SENSOR_INSTALLED_BACKWARD = false;
 
-// create insance of sensor with address 
+// create insance of sensor with address r
 SFM3X00 flowSensor(FLOW_SENSOR_ADDRESS);
 
 #define SCREEN_WIDTH  128
