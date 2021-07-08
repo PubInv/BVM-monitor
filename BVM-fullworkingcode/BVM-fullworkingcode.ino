@@ -29,11 +29,11 @@ int bigcounting = 1;
 // of the physical connections you are using.
 bool SENSOR_INSTALLED_BACKWARD = false;
 
-// create insance of sensor with address r
+// create insance of sensor with address 
 SFM3X00 flowSensor(FLOW_SENSOR_ADDRESS);
 
-#define SCREEN_WIDTH  128
-#define SCREEN_HEIGHT 128 // Change this to 96 for 1.27" display.
+#define SCREEN_WIDTH  240
+#define SCREEN_HEIGHT 320 // Change this to 96 for 1.27" display.
 
 // The SSD1351 is connected like this (plus VCC plus GND)
 //const uint8_t   display_pin_scl_sck        = 13;
@@ -47,7 +47,8 @@ SFM3X00 flowSensor(FLOW_SENSOR_ADDRESS);
 
 // declare the display
 //Adafruit_SSD1351 display = Adafruit_SSD1351(SCREEN_WIDTH,SCREEN_HEIGHT,&SPI,display_pin_cs_ss,display_pin_dc_rs,display_pin_res_rst);
-Adafruit_ST7735 display = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
+//Adafruit_ST7735 display = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
+Adafruit_ST7789 display = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 
 // SSD1331 color definitions
 const uint16_t  Black        = 0x0000;
@@ -223,7 +224,7 @@ float error_for_faking = 1.2;
 bool error_reset = false;
 
 void setup() {
-   display.initR(INITR_GREENTAB);
+   display.init(240,320);
 
   // initialise the SSD1331
  // display.begin();
@@ -288,7 +289,7 @@ float min_recorded_flow = 0.0;
 
 
 void loop() {
-  display.fillScreen(BLACK);
+ display.fillScreen(BLACK);
   // read the millisecond clock...
   long m = millis();
   // if m > breath_length_ms, we are doing to change our random error number...
@@ -366,7 +367,7 @@ void loop() {
       squeeze = false;
       restime = 0;
       //display.fillRect(0, 0, 128, 128, Red);
-      display.setTextSize(3);
+     /* display.setTextSize(3);
       display.setTextColor(Blue, Black);
       display.setCursor(10,50);
       display.print("0.0000");
@@ -375,7 +376,7 @@ void loop() {
       display.setTextColor(Black, Black);
       display.setCursor(25,100);
       display.print("DANGER");
-      count = 0;
+      count = 0;*/
      }
      
   }
@@ -518,5 +519,3 @@ void loop() {
     alarm = false;
   }
 }
-
-  
