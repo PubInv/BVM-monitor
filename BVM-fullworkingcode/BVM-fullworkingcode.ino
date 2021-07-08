@@ -76,6 +76,38 @@ uint16_t        display_Background_Color    = Blue;
 
 unsigned long previousMillis = 0;
 
+//Defining the alarm sounds
+#define FIRSTTONE 261.626
+#define SECONDTONE 440
+#define THIRDTONE 349.228
+#define FOURTHTONE 0
+#define FIFTHTONE 440
+#define SIXTHTONE 349.228
+#define TONEDURATION_MS 500
+
+/*tone(speakerPin, 261.626, 250);
+    //Serial.println(millis());
+    tone(speakerPin, 440, 250);
+    tone(speakerPin, 349.228, 250);
+    tone(speakerPin, 0, 250);
+    tone(speakerPin, 440, 250);
+    tone(speakerPin, 349.228, 250);*/
+
+// Variables for supporting multiple tones
+boolean FirstTone = false;
+boolean SecondTone = false;
+boolean ThirdTone = false;
+boolean FourthTone = false;
+boolean FifthTone = false;
+boolean SixthTone = false;
+long startFirst;
+long startSecond;
+long startThird;
+long startFourth;
+long startFifth;
+long startSixth;
+boolean alarm;
+
 ////////////////////////////////
 // here I set up the basic math to describe the situation that Breathe Easy asked of me.
 #define TARGET_BAR_PERCENT 0.75 // we'll draw the target line at this percentage of the height
@@ -254,13 +286,6 @@ float min_recorded_flow = 0.0;
 
 /////////////////////////////////
 
-// Variables for supporting multiple tones
-boolean FirstTone = false;
-boolean SecondTone = false;
-long startFirst;
-long startSecond;
-boolean alarm;
-
 
 void loop() {
   display.fillScreen(BLACK);
@@ -400,7 +425,7 @@ void loop() {
       }
   
   count = count+1;
-  if(count == 70)
+  if(interval % 6 == 0)
   {
     
     if(G_volume >= 0 && G_volume < 400)
@@ -442,6 +467,8 @@ void loop() {
     alarmcount = alarmcount +1 ;
     //}
   }
+  Serial.println("alarmcount");
+  Serial.println(alarmcount);
   if (alarmcount >= 3)
   {
 
@@ -450,32 +477,45 @@ void loop() {
   if (alarm) {
     FirstTone = true;
     startFirst = millis();
-    tone(SPEAKER_PIN,440,500);
+    tone(speakerPin,FIRSTTONE,TONEDURATION_MS);
     alarm = false;
   }
 
-  if (FirstTone && millis() > (startFirst + 500)) {
+  
+    Serial.println("BVM");
+    
+    }
+  }
+  if (FirstTone && millis() > (startFirst + TONEDURATION_MS)) {
     SecondTone = true;
-    tone(SPEAKER_PIN,220,500);
+    tone(speakerPin,SECONDTONE,TONEDURATION_MS);
     startSecond = millis();
     FirstTone = false;
   }
-
-  if (SecondTone && millis() > (startSecond + 500)) {
-    noTone(SPEAKER_PIN);
-    FirstTone = false;
+  if (SecondTone && millis() > (startSecond + TONEDURATION_MS)) {
+    tone(speakerPin,THIRDTONE,TONEDURATION_MS);
+    startThird = millis();
     SecondTone = false;
-    alarm = false;
   }
-    Serial.println("BVM");
-    tone(speakerPin, 261.626, 250);
-    //Serial.println(millis());
-    tone(speakerPin, 440, 250);
-    tone(speakerPin, 349.228, 250);
-    tone(speakerPin, 0, 250);
-    tone(speakerPin, 440, 250);
-    tone(speakerPin, 349.228, 250);
-    }
+  if (ThirdTone && millis() > (startThird + TONEDURATION_MS)) {
+    tone(speakerPin,FOURTHTONE,TONEDURATION_MS);
+    startFourth = millis();
+    ThirdTone = false;
+  }
+  if (FourthTone && millis() > (startFourth + TONEDURATION_MS)) {
+    tone(speakerPin,FIFTHTONE,TONEDURATION_MS);
+    startFifth = millis();
+    FourthTone = false;  
+  }
+  if (FifthTone && millis() > (startFifth + TONEDURATION_MS)) {
+    tone(speakerPin,SIXTHTONE,TONEDURATION_MS);
+    startSixth = millis();
+    FifthTone = false;  
+  }
+  if (SixthTone && millis() > (startSixth + TONEDURATION_MS)) {
+    noTone(speakerPin);
+    SixthTone = false;
+    alarm = false;
   }
 }
 
