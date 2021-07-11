@@ -3,7 +3,7 @@ A monitor for Bag Valve Masks to measure flow (tidal volume) and prevent operato
 
 ## Motivation
 
-Bag Valve Masks are a fundamental tool used by first responders to assiste patients in respiratory distress. A recognized problem is that they can produce
+Bag Valve Masks are a fundamental tool used by first responders to assist patients in respiratory distress. A recognized problem is that they can produce
 barotrauma and other forms of volumetric trauma. Particularly in stressful situations, they may be overused. 
 
 The basic idea of this project is to build a small electronic gadget that helps an operator use the device correctly by measuring and correcting both 
