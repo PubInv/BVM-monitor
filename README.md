@@ -13,7 +13,7 @@ the tidal volume delivered and the flow.
 
 This idea was created in conversation between Robert L. Read and Dr. Erich Schulz of Australia while working on the [VentOS project](https://gitlab.com/project-ventos/ventos). Public Invention already had the [VentMon](https://github.com/PubInv/ventmon-ventilator-inline-test-monitor), which performed flow measurement and integrated it get Tidal Volume. This was presented to a Rice University Freshman Design Team, called "Mask and You Shall Recieve" TBD: put their names here!
 
-In the course of the 20-21 school year that did a fair amount of research (including finding an earlier project at Pittsburg, apparently now abandonded.) They
+In the course of the 20-21 school year that did a fair amount of research (including finding an earlier project at Pittsburg, apparently now abandoned.) They
 took a VentMon and essentially removed features, producing a stripped-down version that could be thought of as a separate device. They successfully moved the 
 integration of flow from the Sensirion SFM3X00 sensor into the Arduino code.
 
