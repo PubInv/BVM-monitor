@@ -13,7 +13,9 @@ int alarmcount = 0;
 const int speakerPin = 5;
 int ledState = LOW;
 
-int count = 0;
+bool screenUpdate = true;
+
+//int count = 0;
 bool squeeze = false;
 int restime;
 int startreset;
@@ -34,6 +36,9 @@ SFM3X00 flowSensor(FLOW_SENSOR_ADDRESS);
 
 #define SCREEN_WIDTH  240
 #define SCREEN_HEIGHT 320 // Change this to 96 for 1.27" display.
+
+//#define SCREEN_WIDTH  128
+//#define SCREEN_HEIGHT 128 // Change this to 96 for 1.27" display.
 
 // The SSD1351 is connected like this (plus VCC plus GND)
 //const uint8_t   display_pin_scl_sck        = 13;
@@ -109,21 +114,22 @@ long startFifth;
 long startSixth;
 boolean alarm;
 
+
 ////////////////////////////////
 // here I set up the basic math to describe the situation that Breathe Easy asked of me.
-#define TARGET_BAR_PERCENT 0.75 // we'll draw the target line at this percentage of the height
-#define GOOD_BAR_PERCENT 0.1 // 10% below the target percentage
-#define BAD_BAR_PERCENT 0.1 // 10% above the target percentage
+#define TARGET_BAR_PERCENT 0.556 // we'll draw the target line at this percentage of the height
+#define GOOD_BAR_PERCENT 0.0895 // 10% below the target percentage
+#define BAD_BAR_PERCENT 0.0895 // 10% above the target percentage
 
 // This defines two separate "bars" --- because I only have a monocrhome display,
 // I am doing two side-by-side
 #define MEASURE_BAR_START_HORIZONTAL 0.1
-#define MEASURE_BAR_WIDTH_HORIZONTAL 0.8
+#define MEASURE_BAR_WIDTH_HORIZONTAL 0.4
 #define TARGET_BAR_START_HORIZONTAL 0.6
 #define TARGET_BAR_WIDTH_HORIZONTAL 0.4
 
-float target_tidal_volume_ml = 450.0; // This is used to set the meaning of the "target" bar
-float breath_length_ms = 6000.0; // the length of a breath in ms.
+float target_tidal_volume_ml = 556; // This is used to set the meaning of the "target" bar
+float breath_length_ms = 8000.0; // the length of a breath in ms.
 float inspiration_time_ms = 2000.0; // the target length of an "inspiration"
 
 
@@ -144,34 +150,42 @@ void myEraseInteriorRect(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, uint1
 // draw the empty bar
 void render_empty_measure_bar() {
   uint16_t left = SCREEN_WIDTH * MEASURE_BAR_START_HORIZONTAL;
-  uint16_t top = SCREEN_HEIGHT * (1.0 - ((float) TARGET_BAR_PERCENT + (float) BAD_BAR_PERCENT)) ;
+  float total_height = 0.95;
+ //uint16_t top = SCREEN_HEIGHT * (1.0 - ((float) TARGET_BAR_PERCENT + (float) BAD_BAR_PERCENT)) ;
+  uint16_t top = SCREEN_HEIGHT * (1.0 - ((float) total_height));
   uint16_t width = SCREEN_WIDTH * (float) MEASURE_BAR_WIDTH_HORIZONTAL;
   uint16_t bheight = SCREEN_HEIGHT * ((float) TARGET_BAR_PERCENT + (float) BAD_BAR_PERCENT);
   uint16_t theight = SCREEN_HEIGHT * ((float) TARGET_BAR_PERCENT);
   uint16_t gheight = SCREEN_HEIGHT * ((float) TARGET_BAR_PERCENT - GOOD_BAR_PERCENT);
-
-  myDrawRect(left,top,width,bheight,WHITE, false);
-
-  display.drawLine(left, SCREEN_HEIGHT - theight,left+ width-1, SCREEN_HEIGHT - theight, WHITE);
-  display.drawLine(left, SCREEN_HEIGHT - gheight,left+ width-1, SCREEN_HEIGHT - gheight, WHITE);
+  uint16_t height = SCREEN_HEIGHT * total_height;
+ 
+  myDrawRect(left,top,width,height,WHITE, false);
+ 
+  display.drawLine(left, SCREEN_HEIGHT - theight,left+ width-1, SCREEN_HEIGHT - theight, GREEN);
+  display.drawLine(left, SCREEN_HEIGHT - gheight,left+ width-1, SCREEN_HEIGHT - gheight, BLUE);
+  display.drawLine(left, SCREEN_HEIGHT - bheight,left+ width-1, SCREEN_HEIGHT - bheight, RED);
 }
 void render_empty_target_bar() {
    uint16_t left = SCREEN_WIDTH * TARGET_BAR_START_HORIZONTAL;
-  uint16_t top = SCREEN_HEIGHT * (1.0 - ((float) TARGET_BAR_PERCENT + (float) BAD_BAR_PERCENT)) ;
+   float total_height = 0.95;
+  //uint16_t top = SCREEN_HEIGHT * (1.0 - ((float) TARGET_BAR_PERCENT + (float) BAD_BAR_PERCENT)) ;
+  uint16_t top = SCREEN_HEIGHT * (1.0 - ((float) total_height));
   uint16_t width = SCREEN_WIDTH *  (float) TARGET_BAR_WIDTH_HORIZONTAL;
-  uint16_t height = SCREEN_HEIGHT * ((float) TARGET_BAR_PERCENT + (float) BAD_BAR_PERCENT);
+ // uint16_t height = SCREEN_HEIGHT * ((float) TARGET_BAR_PERCENT + (float) BAD_BAR_PERCENT);
+ uint16_t height = SCREEN_HEIGHT * total_height;
 
   uint16_t bheight = SCREEN_HEIGHT * ((float) TARGET_BAR_PERCENT + (float) BAD_BAR_PERCENT);
   uint16_t theight = SCREEN_HEIGHT * ((float) TARGET_BAR_PERCENT);
-  uint16_t gheight = SCREEN_HEIGHT * ((float) TARGET_BAR_PERCENT - GOOD_BAR_PERCENT);
+  uint16_t gheight = SCREEN_HEIGHT * ((float) TARGET_BAR_PERCENT - (float) GOOD_BAR_PERCENT);
   myDrawRect(left,top,width,height,WHITE, false);
 
-  display.drawLine(left, SCREEN_HEIGHT - theight,left+ width-1, SCREEN_HEIGHT - theight, WHITE);
-  display.drawLine(left, SCREEN_HEIGHT - gheight,left+ width-1, SCREEN_HEIGHT - gheight, WHITE);
+  display.drawLine(left, SCREEN_HEIGHT - theight,left+ width-1, SCREEN_HEIGHT - theight, GREEN);
+  display.drawLine(left, SCREEN_HEIGHT - gheight,left+ width-1, SCREEN_HEIGHT - gheight, BLUE);
+  display.drawLine(left, SCREEN_HEIGHT - bheight,left+ width-1, SCREEN_HEIGHT - bheight, RED);
 }
 void render_empty_bars() {
   render_empty_measure_bar();
-  // render_empty_target_bar();
+  render_empty_target_bar();
 }
 
 // render the bar to a certain percentage height, dealing with "good" and "bad" color changes
@@ -183,6 +197,9 @@ float convert_tv_ml_to_percent(int tv) {
 
 }
 
+// This is for erasing...
+int current_line_height = -1;
+
 // render the "target line" as a percentage
 void render_target_line(float percent) {
   uint16_t left = SCREEN_WIDTH * TARGET_BAR_START_HORIZONTAL;
@@ -190,12 +207,29 @@ void render_target_line(float percent) {
   uint16_t top = SCREEN_HEIGHT * (1.0 - ((float) TARGET_BAR_PERCENT + (float) BAD_BAR_PERCENT)) ;
  uint16_t theight = SCREEN_HEIGHT * ((float) TARGET_BAR_PERCENT);
   uint16_t pheight = (float) theight * ((float) percent);
+  uint16_t gheight = SCREEN_HEIGHT * ((float) TARGET_BAR_PERCENT - GOOD_BAR_PERCENT);
 
+// We will first erase the last line if their is one..
+  if (current_line_height > 0) {
+   Serial.println("ROB"); 
+   display.drawLine(left,
+    SCREEN_HEIGHT - current_line_height,
+    left+ width-1,
+    SCREEN_HEIGHT - current_line_height,
+    BLACK);   
+  }
+  Serial.println("current");
+  Serial.println(current_line_height);
+  Serial.println(pheight);
+  // now recored our current_line_height
+  current_line_height = pheight; 
+
+  uint16_t color = (current_line_height < gheight) ? BLUE : GREEN;
   display.drawLine(left,
     SCREEN_HEIGHT - pheight,
     left+ width-1,
     SCREEN_HEIGHT - pheight,
-    WHITE);
+    color);
 }
 
 // render_tv as a filled_in rect
@@ -206,17 +240,36 @@ void render_tv(float tv) {
  uint16_t theight = SCREEN_HEIGHT * ((float) TARGET_BAR_PERCENT);
  // measured height
  uint16_t mheight = (float) theight * (tv / target_tidal_volume_ml);
+ uint16_t gheight = SCREEN_HEIGHT * ((float) TARGET_BAR_PERCENT - GOOD_BAR_PERCENT);
+// uint16_t pheight = (float) theight * ((float) percent);
+uint16_t bheight = SCREEN_HEIGHT * ((float) TARGET_BAR_PERCENT + (float) BAD_BAR_PERCENT);
 
 
-  myDrawRect(left,SCREEN_HEIGHT - mheight,width, SCREEN_HEIGHT,WHITE, true);
-  display.drawLine(left,
-    SCREEN_HEIGHT - mheight,
-    left+ width-1,
-    SCREEN_HEIGHT - mheight,
-    WHITE);
+//Squeeze Rectangle
+  //myDrawRect(left,SCREEN_HEIGHT - mheight,width, SCREEN_HEIGHT,WHITE, true);
+  //display.drawLine(left,SCREEN_HEIGHT - mheight, left+ width-1, SCREEN_HEIGHT - mheight, WHITE);
+
+
+//Colored Version
+if (mheight < gheight)
+{
+  myDrawRect(left,SCREEN_HEIGHT - mheight,width, SCREEN_HEIGHT,BLUE, false);
+  display.drawLine(left,SCREEN_HEIGHT - mheight, left+ width-1, SCREEN_HEIGHT - mheight, BLUE);
 }
+ else if (mheight > bheight)
+ {
+  myDrawRect(left,SCREEN_HEIGHT - mheight,width, SCREEN_HEIGHT,RED, false);
+  display.drawLine(left,SCREEN_HEIGHT - mheight, left+ width-1, SCREEN_HEIGHT - mheight, RED);
+ }
+ else if(mheight >=gheight && mheight <= bheight)
+ {
+  myDrawRect(left,SCREEN_HEIGHT - mheight,width, SCREEN_HEIGHT,GREEN, false);
+  display.drawLine(left,SCREEN_HEIGHT - mheight, left+ width-1, SCREEN_HEIGHT - mheight, GREEN);
+ }
+}
+
 float compute_percent_of_inspiration(long ms) {
-  if (ms < (long) inspiration_time_ms) {
+  if ((ms >= 0) && (ms < (long) inspiration_time_ms)) {
     Serial.println("xxx");
     return (float) ms / (float) inspiration_time_ms;
   } else {
@@ -233,7 +286,9 @@ void erase_screen() {
 }
 
 void setup() {
-   display.init(240,320);
+display.init(240,320);
+  // void setup() {
+   //display.initR(INITR_GREENTAB);
 
   // initialise the SSD1331
  // display.begin();
@@ -269,6 +324,7 @@ void setup() {
 // For calibrating, we will simply compute positive and negative volumes via integration,
 // Setting to zero on putton press of the display
 float G_volume = 0.0;
+float G_volume_previous = 0.0;
 float last_ms = 0.0;
 float last_flow = 0.0;
 
@@ -308,7 +364,27 @@ void loop() {
   // Perform "modulo" operation to get ms within the current breath
   m = m % (long) breath_length_ms;
 
-  float percent_full = compute_percent_of_inspiration(m);
+  // When we are done with the current inspiration we will set another random error...
+  if (!error_reset) {
+    if (m > inspiration_time_ms) {
+      // We'll fake being either 20% too high or too low for now...
+      error_for_faking =   1.0 + 0.2 * (float) (random(100) - 50) / 50.0 ;
+      error_reset = true;
+    } else {
+      error_reset = false;
+    }
+  } 
+
+  //float percent_full = compute_percent_of_inspiration(m);
+  float percent_full = compute_percent_of_inspiration(m - 1000);
+
+  render_empty_bars();
+
+  render_target_line(percent_full);
+
+  float f = (m > inspiration_time_ms) ? 1.0 * error_for_faking : percent_full * error_for_faking;
+
+  long fake_tv = f * target_tidal_volume_ml;
 
   short int incomingByte;
   while (Serial.available() > 0) {
@@ -359,7 +435,6 @@ void loop() {
       display.setTextColor(Blue, Black);
       display.setCursor(10,50);
       display.print("0.0000");
-
       display.setTextSize(2);
       display.setTextColor(Black, Black);
       display.setCursor(25,100);
@@ -376,13 +451,26 @@ void loop() {
   float flow_milliliters_per_minute =  (flow * 1000.0);
 
   G_volume = add_to_running_integration(G_volume, ms,flow_milliliters_per_minute);
+     /* if( G_volume > 650)
+      {
+        G_volume = 650;
+      }*/
+
+     if (G_volume< 0)
+      {
+      G_volume = 0;
+      }
+      
   Serial.println(G_volume);
 
   //  display.fillScreen(BLACK);
   //  render_empty_bars();
   //  render_target_line(percent_full);
-  render_tv(G_volume);
-
+    if (G_volume_previous != G_volume) {
+        G_volume_previous = G_volume;
+        render_tv(G_volume);
+        screenUpdate = true;
+    }
 
   //display.display();
   yield();
@@ -398,16 +486,23 @@ void loop() {
   Serial.println(raw_flow_slm);*/
 
 
-  unsigned long currentMillis = millis();
-  if (currentMillis - previousMillis >= 1000) {
+  //unsigned long currentMillis = millis();
+ /* if (currentMillis - previousMillis >= 1000) {
     previousMillis = currentMillis;
     interval = interval +1;
-  }
+  }*/
+
+  interval =m/1000;
+  // interval = ((int) floor( m / 1000.0)) % 6;
 
   Serial.println(interval);
-      if (interval % 6 == 0){
+     if (((interval-2) % 8 == 0) || 
+         ((interval-1) % 8 == 0))
+      {
+      //if (interval % 8 == 0){
       //changed from tone (12, 700, 1000);
-      tone(speakerPin, 329.628, 1000);
+      tone(speakerPin, 329.628, 2000);
+      //tone(speakerPin, 20, 2000);
       //Serial.println("Speaker");
       }
       else {
@@ -416,12 +511,17 @@ void loop() {
 
       }
 
-  count = count+1;
-  if(interval % 6 == 0)
-  {
-    eraseScreen();
+  //count = count+1;
+  if(interval % 8 == 0)
+  { 
+      if (screenUpdate==true)
+      {
+        erase_screen();
+        screenUpdate = false;
+      }
+      
 
-    if(G_volume >= 0 && G_volume < 400)
+    if(G_volume >= 0 && G_volume < 466.5)
     {
 
     /*//display.fillScreen(Blue);
@@ -433,40 +533,39 @@ void loop() {
     alarmcount = alarmcount +1 ;
     }
 
-    else if(G_volume >= 450 && G_volume < 650)
+    else if(G_volume >= 466.5 && G_volume < 645.5)
     {
     /*//display.fillScreen(Green);
     display.setTextSize(5);
     display.setTextColor(Green, Black);
     display.setCursor(10,50);
     display.print(G_volume);*/
-    count = 0;
+    //count = 0;
     alarmcount = 0;
     }
 
-    else if(G_volume >= 650)
+    else if(G_volume >= 645.5)
     {
     //display.fillScreen(Red);
    /* display.setTextSize(5);
     display.setTextColor(Red, Black);
     display.setCursor(10,50);
     display.print(G_volume);
-
     display.setTextSize(2);
     display.setTextColor(Red, Black);
     display.setCursor(25,100);
     display.print("DANGER");
     count = 0;*/
     alarmcount = alarmcount +1 ;
-    //}
+    }
 
     // Now erase the screen...
 
   }
-  Serial.println("alarmcount");
+ /* Serial.println("alarmcount");
   Serial.println(alarmcount);
   if (alarmcount >= 3)
-  {
+  { //startFirst = millis();
 
     Serial.println("BVM");
     alarm = true;
@@ -480,9 +579,9 @@ void loop() {
 
     Serial.println("BVM");
 
-    }
-  }
-  if (FirstTone && millis() > (startFirst + TONEDURATION_MS)) {
+    //}
+  
+  if ( FirstTone && (millis() > (startFirst + TONEDURATION_MS)) /*&& (startFirst != 0) ) {
     SecondTone = true;
     tone(speakerPin,SECONDTONE,TONEDURATION_MS);
     startSecond = millis();
@@ -512,5 +611,5 @@ void loop() {
     noTone(speakerPin);
     SixthTone = false;
     alarm = false;
+  }*/
   }
-}
