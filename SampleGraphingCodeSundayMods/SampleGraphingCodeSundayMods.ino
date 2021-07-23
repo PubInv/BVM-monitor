@@ -1,3 +1,18 @@
+/*
+Public Invention's BVM-monitor Project is a monitor for Bag Valve Masks to measure flow (tidal volume) and prevent operator misuse. This project includes open-source software and hardware designs to support manufacturing of a bag valve sensor to support operators as they administer first aid. This device aims to measure and correct both the tidal volume delivered and the flow. Copyright (C) 2021 Robert Read, Alois Chipfurutse, Matthew Gutierrez, Alvin K. Ibeabuchi, and Darío Hereñú.
+
+This program is free Firmware/Hardware designs: you can redistribute, use, study it and/or modify it under the terms of the CERN Open Hardware License Version 2 as published here: https://ohwr.org/cern_ohl_s_v2.txt
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the CERN Open Hardware License Version 2 for more details.
+You should have received a copy of the CERN Open Hardware License Version 2 along with this program.  If not, see https://ohwr.org/cern_ohl_s_v2.txt.
+
+This program includes free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see https://www.gnu.org/licenses/
+*/
+
 #include <SFM3X00.h>
 
 #include <Wire.h>
@@ -411,7 +426,7 @@ void loop() {
       {
       G_volume = 0;
       }
-      
+
   Serial.println(G_volume);
 
   //  display.fillScreen(BLACK);
@@ -424,7 +439,7 @@ void loop() {
         render_target_line(percent_full);
         screenUpdate = true;
     }
-    
+
 
 // ALOIS -- I'm not sure this should be commented out; possibly it dhouls be moved into the "if" block above,
 // and called only if make an update. You could perhpas use the screenUpdate to do this.
@@ -461,13 +476,13 @@ void loop() {
 
   //count = count+1;
   if(interval % 6 == 0)
-  { 
+  {
       if (screenUpdate==true)
       {
         erase_screen();
         screenUpdate = false;
       }
-      
+
 
     if(G_volume >= 0 && G_volume < 400)
     {
@@ -513,12 +528,12 @@ void loop() {
   Serial.println("alarmcount");
   Serial.println(alarmcount);
   if (alarmcount >= 3)
-  { 
+  {
     Serial.println("BVM");
     alarm = true;
   }
   // ALOIS -- I put extra parentheses around the logic below; I don't know if that is needed.
-  // 
+  //
   if (alarm) {
       FirstTone = true;
       startFirst = millis();
