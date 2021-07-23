@@ -8,6 +8,21 @@
 #include <Adafruit_ST7735.h> // Hardware-specific library for ST7735
 #include <Adafruit_ST7789.h> // Hardware-specific library for ST7789
 
+/*
+Public Invention's BVM-monitor Project is a monitor for Bag Valve Masks to measure flow (tidal volume) and prevent operator misuse. This project includes open-source software and hardware designs to support manufacturing of a bag valve sensor to support operators as they administer first aid. This device aims to measure and correct both the tidal volume delivered and the flow. Copyright (C) 2021 Robert Read, Alois Chipfurutse, Matthew Gutierrez, Alvin K. Ibeabuchi, and Darío Hereñú.
+
+This program is free Firmware/Hardware designs: you can redistribute, use, study it and/or modify it under the terms of the CERN Open Hardware License Version 2 as published here: https://ohwr.org/cern_ohl_s_v2.txt
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the CERN Open Hardware License Version 2 for more details.
+You should have received a copy of the CERN Open Hardware License Version 2 along with this program.  If not, see https://ohwr.org/cern_ohl_s_v2.txt.
+
+This program includes free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see https://www.gnu.org/licenses/
+*/
+
 int interval = 0;
 int alarmcount = 0;
 const int speakerPin = 5;
@@ -157,7 +172,7 @@ void render_empty_measure_bar() {
 //  myDrawRect(left, SCREEN_HEIGHT- theight,width,theight-gheight,GREEN, true);
 //  myDrawRect(left, SCREEN_HEIGHT-gheight,width, theight,BLUE,true);
 //  myDrawRect(left, top,width,SCREEN_HEIGHT-theight,RED,true);
- 
+
   myDrawRect(left,top,width,bheight,WHITE, false);
   display.drawLine(left, SCREEN_HEIGHT - theight,left+ width-1, SCREEN_HEIGHT - theight, WHITE);
   display.drawLine(left, SCREEN_HEIGHT - gheight,left+ width-1, SCREEN_HEIGHT - gheight, WHITE);
@@ -207,10 +222,10 @@ void render_target_line(float percent) {
     SCREEN_HEIGHT - current_line_height,
     left+ width-1,
     SCREEN_HEIGHT - current_line_height,
-    BLACK);   
+    BLACK);
   }
   // now recored our current_line_height
-  current_line_height = pheight; 
+  current_line_height = pheight;
   display.drawLine(left,
     SCREEN_HEIGHT - pheight,
     left+ width-1,
@@ -353,7 +368,7 @@ void loop() {
     } else {
       error_reset = false;
     }
-  } 
+  }
 
   float percent_full = compute_percent_of_inspiration(m);
 
@@ -439,7 +454,7 @@ void loop() {
       {
       G_volume = 0;
       }
-      
+
   Serial.println(G_volume);
 
   //  display.fillScreen(BLACK);
@@ -485,13 +500,13 @@ void loop() {
 
   //count = count+1;
   if(interval % 6 == 0)
-  { 
+  {
       if (screenUpdate==true)
       {
         erase_screen();
         screenUpdate = false;
       }
-      
+
 
     if(G_volume >= 0 && G_volume < 466.5)
     {
@@ -552,7 +567,7 @@ void loop() {
     Serial.println("BVM");
 
     //}
-  
+
   if ( FirstTone && (millis() > (startFirst + TONEDURATION_MS)) /*&& (startFirst != 0) ) {
     SecondTone = true;
     tone(speakerPin,SECONDTONE,TONEDURATION_MS);
